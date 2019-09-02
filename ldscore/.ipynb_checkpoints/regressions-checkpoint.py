@@ -152,7 +152,6 @@ class LD_Score_Regression(object):
             raise ValueError(
                 'N, weights and response (z1z2 or chisq) must have shape (n_snp, 1).')
         if M.shape != (1, self.n_annot):
-	    print(M.shape,self.n_annot)
             raise ValueError('M must have shape (1, n_annot).')
 
         M_tot = float(np.sum(M))

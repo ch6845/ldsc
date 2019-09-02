@@ -383,10 +383,11 @@ class LstsqJackknifeFast(Jackknife):
         n_blocks, p = _check_shape_block(xty_block_values, xtx_block_values)
         xty = np.sum(xty_block_values, axis=0)
         xtx = np.sum(xtx_block_values, axis=0)
-        temp=np.linalg.lstsq(xtx, xty)
-        print(temp[1:])
-        return temp[0].reshape((1,p))
-        #return np.linalg.solve(xtx, xty).reshape((1, p))
+        
+        return np.linalg.solve(xtx, xty).reshape((1, p))
+        #temp=np.linalg.lstsq(xtx, xty)
+        #print temp[1:]
+        #return temp[0].reshape((1, p))
 
     @classmethod
     def block_values_to_delete_values(cls, xty_block_values, xtx_block_values):
@@ -425,8 +426,9 @@ class LstsqJackknifeFast(Jackknife):
             delete_xtx = xtx_tot - xtx_block_values[j]
             #delete_values[j, ...] = np.linalg.solve(delete_xtx, delete_xty).reshape((1, p))
             temp=np.linalg.lstsq(delete_xtx, delete_xty)
-            #print(temp[1:])
+            print temp[1:]
             delete_values[j, ...] = temp[0].reshape((1, p))
+
         return delete_values
 
 

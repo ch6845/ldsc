@@ -152,7 +152,6 @@ class LD_Score_Regression(object):
             raise ValueError(
                 'N, weights and response (z1z2 or chisq) must have shape (n_snp, 1).')
         if M.shape != (1, self.n_annot):
-	    print(M.shape,self.n_annot)
             raise ValueError('M must have shape (1, n_annot).')
 
         M_tot = float(np.sum(M))
@@ -216,12 +215,13 @@ class LD_Score_Regression(object):
         self.coef, self.coef_cov, self.coef_se = self._coef(jknife, Nbar)
         self.cat, self.cat_cov, self.cat_se =\
             self._cat(jknife, M, Nbar, self.coef, self.coef_cov)
-        #print self.cat
+
         self.tot, self.tot_cov, self.tot_se = self._tot(self.cat, self.cat_cov)
         self.prop, self.prop_cov, self.prop_se =\
             self._prop(jknife, M, Nbar, self.cat, self.tot)
 
-        self.enrichment, self.M_prop = self._enrichment(M, M_tot, self.cat, self.tot)
+        self.enrichment, self.M_prop = self._enrichment(
+            M, M_tot, self.cat, self.tot)
         if not self.constrain_intercept:
             self.intercept, self.intercept_se = self._intercept(jknife)
 
@@ -229,7 +229,9 @@ class LD_Score_Regression(object):
         self.tot_delete_values = self._delete_vals_tot(jknife, Nbar, M)
         self.part_delete_values = self._delete_vals_part(jknife, Nbar, M)
         if not self.constrain_intercept:
-            self.intercept_delete_values = jknife.delete_values[:, self.n_annot]
+            self.intercept_delete_values = jknife.delete_values[
+                :, self.n_annot]
+
         self.M = M
 
     @classmethod
@@ -447,17 +449,9 @@ class Hsq(LD_Score_Regression):
         else:
             T = 'Observed'
             c = 1
-        """
+
         out = ['Total ' + T + ' scale h2: ' +
                s(c * self.tot) + ' (' + s(c * self.tot_se) + ')']
-        """
-        #Code block added by Chanwoo Kim starts here
-        
-        out=['Total ' + 'Observed' + ' scale h2: ' + s(self.tot) + ' (' + s(self.tot_se) + ')']
-        out.append('Total ' + 'Liability' + ' scale h2: ' + s(c*self.tot) + ' (' + s(c*self.tot_se) + ')')
-        #Code block added by Chanwoo Kim ends here
-
-        
         if self.n_annot > 1:
             if ref_ld_colnames is None:
                 ref_ld_colnames = ['CAT_' + str(i)
@@ -466,18 +460,8 @@ class Hsq(LD_Score_Regression):
             out.append('Categories: ' + ' '.join(ref_ld_colnames))
 
             if not overlap:
-                """
                 out.append(T + ' scale h2: ' + s(c * self.cat))
                 out.append(T + ' scale h2 SE: ' + s(c * self.cat_se))
-                """
-                #Code block added by Chanwoo Kim starts here
-                out.append('Observed' + ' scale h2: ' + s(self.cat))
-                out.append('Observed' + ' scale h2 SE: ' + s(self.cat_se))
-                
-                out.append('Liability' + ' scale h2: ' + s(c * self.cat))
-                out.append('Liability' + ' scale h2 SE: ' + s(c * self.cat_se))
-                #Code block added by Chanwoo Kim ends here
-                
                 out.append('Proportion of SNPs: ' + s(self.M_prop))
                 out.append('Proportion of h2g: ' + s(self.prop))
                 out.append('Enrichment: ' + s(self.enrichment))

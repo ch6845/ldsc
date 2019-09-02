@@ -1,3 +1,4 @@
+
 '''
 (c) 2014 Brendan Bulik-Sullivan and Hilary Finucane
 
@@ -29,6 +30,7 @@ def sub_chr(s, chr):
 
 
 def which_compression(fh):
+    #print(fh)
     '''Given a file prefix, figure out what sort of compression to use.'''
     if os.access(fh + '.bz2', 4):
         suffix = '.bz2'
@@ -89,6 +91,7 @@ def sumstats(fh, alleles=False, dropna=True):
 def ldscore_fromlist(flist, num=None):
     '''Sideways concatenation of a list of LD Score files.'''
     ldscore_array = []
+    #print flist,num
     for i, fh in enumerate(flist):
         y = ldscore(fh, num)
         if i > 0:
@@ -135,42 +138,35 @@ def ldscore(fh, num=None):
     if num is not None:  # num files, e.g., one per chromosome
         first_fh = sub_chr(fh, 1) + suffix
         s, compression = which_compression(first_fh)
+        
+        #aa=l2_parser(sub_chr(fh, 1) + suffix + s, compression)
+        #raise ImportError('LDSC requires pandas version >= 0.17.0')
         chr_ld = [l2_parser(sub_chr(fh, i) + suffix + s, compression) for i in xrange(1, num + 1)]
-        
-        #Code block added by Chanwoo Kim starts here
-        
-        if chr_ld[0].columns[-1]!=chr_ld[1].columns[-1]:
-            print "*************************************************"
-            print "Control flow made by Chanwoo Kim executed!. Be cautious..."
-            print "Concatenate chr files having different categories"
-            print "*************************************************"
-            """
+        #print "part2_____",chr_ld[0].head()
+        #print "part3_____",chr_ld[8].head()
+
+        if len(chr_ld[0].columns)!=len(chr_ld[1].columns):
+            print("!!!!!!!!!!!!!!!!!!!!!")
+            print("Modified by Chanwoo. Concatenate chr files having different categories")
+            print("!!!!!!!!!!!!!!!!!!!!!")
             col_inter=chr_ld[0].columns
             col_union=chr_ld[0].columns
             for df in chr_ld:
-                #print df.columns.drop(col_common)
                 col_inter=col_inter.intersection(df.columns)
                 col_union=col_union.union(df.columns)
             cols=col_inter.append(col_union.difference(col_inter))
-            """
-            col_common=chr_ld[0].columns.intersection(chr_ld[1].columns)
-            cols=col_common.append([df.columns.drop(col_common) for df in chr_ld])
             x=pd.concat(chr_ld)[cols]
-            x = x.sort_values(by=['CHR', 'BP'])
-            return x.drop(['CHR','BP'],axis=1).fillna(0).drop_duplicates(subset='SNP')
-        #Code block added by Chanwoo Kim ends here
-        
+            return x.drop(['CHR','BP'],axis=1)
+        ################
         else:
             x = pd.concat(chr_ld)  # automatically sorted by chromosome
-
-
+        #print "part1_____",x.head()
     else:  # just one file
         s, compression = which_compression(fh + suffix)
         x = l2_parser(fh + suffix + s, compression)
-    
+    print "chr concat finished. Message added by Chanwoo"
     x = x.sort_values(by=['CHR', 'BP']) # SEs will be wrong unless sorted
     x = x.drop(['CHR', 'BP'], axis=1).drop_duplicates(subset='SNP')
-    
     return x
 
 
@@ -180,19 +176,9 @@ def M(fh, num=None, N=2, common=False):
     suffix = '.l' + str(N) + '.M'
     if common:
         suffix += '_5_50'
-    
+
     if num is not None:
-        if 'cm' in fh.split('/')[-1] or 'lb' in fh.split('/')[-1] or 'bp' in fh.split('/')[-1]:
-            print "*************************************************"
-            print "Control flow made by Chanwoo Kim executed!. Be cautious..."
-            print "Concatenate M files having different categories"
-            print "*************************************************"
-        
-            parsed_ndarray = [parsefunc(sub_chr(fh, i) + suffix) for i in xrange(1, num + 1)]
-            x = np.hstack(parsed_ndarray)
-            
-        else:
-            x = np.sum([parsefunc(sub_chr(fh, i) + suffix) for i in xrange(1, num + 1)], axis=0)
+        x = np.sum([parsefunc(sub_chr(fh, i) + suffix) for i in xrange(1, num + 1)], axis=0)
     else:
         x = parsefunc(fh + suffix)
 
@@ -201,7 +187,9 @@ def M(fh, num=None, N=2, common=False):
 
 def M_fromlist(flist, num=None, N=2, common=False):
     '''Read a list of .M* files and concatenate sideways.'''
-    
+
+    #'''Read a list of .M* files and concatenate sideways.''
+    #print [M(fh, num, N, common).shape for fh in flist]
     return np.hstack([M(fh, num, N, common) for fh in flist])
 
 
