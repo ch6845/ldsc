@@ -3,6 +3,18 @@
 
 `ldsc` is a command line tool for estimating heritability and genetic correlation from GWAS summary statistics. `ldsc` also computes LD Scores.
 
+## Update Note
+A few functionalities were added in this forked repo.
+
+1. use numpy.linalg.lstsq instead of numpy.linalg.solve
+2. print both observed scale and liability scale simultaneously
+3. concatenate annotation files having different categories by chromosomes.
+	* invoked when appropriate prefix is put in front of annotation files.
+
+These functionalities were added to meet personal needs for our application, and they make implementation of our application more convenient.
+
+They do not affect computation result of this tool.
+
 ## Getting Started
 
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/home/ch6845/tools/miniconda3/envs/py2/bin/python
 '''
 (c) 2014 Brendan Bulik-Sullivan and Hilary Finucane
 
@@ -26,21 +26,25 @@ try:
 except AttributeError:
     raise ImportError('LDSC requires pandas version >= 0.17.0')
 
-__version__ = '1.0.1'
+__version__ = '1.0.0'
 MASTHEAD = "*********************************************************************\n"
 MASTHEAD += "* LD Score Regression (LDSC)\n"
 MASTHEAD += "* Version {V}\n".format(V=__version__)
-MASTHEAD += "* (C) 2014-2019 Brendan Bulik-Sullivan and Hilary Finucane\n"
+MASTHEAD += "* (C) 2014-2015 Brendan Bulik-Sullivan and Hilary Finucane\n"
 MASTHEAD += "* Broad Institute of MIT and Harvard / MIT Department of Mathematics\n"
 MASTHEAD += "* GNU General Public License v3\n"
+MASTHEAD += "*********************************************************************\n"
+MASTHEAD += "* Modified by Chanwoo. Be cautious...*\n"
+MASTHEAD += "*********************************************************************\n"
 MASTHEAD += "*********************************************************************\n"
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 pd.set_option('precision', 4)
 pd.set_option('max_colwidth',1000)
-np.set_printoptions(linewidth=1000)
+np.set_printoptions(linewidth=10000000)
 np.set_printoptions(precision=4)
+np.set_printoptions(threshold=100000)
 
 
 def sec_to_str(t):
@@ -153,7 +157,18 @@ def ldscore(args, log):
                 annot_matrix = np.array(annot.df.iloc[:,4:])
                 annot_colnames = annot.df.columns[4:]
                 keep_snps = None
-                if np.any(annot.df.SNP.values != array_snps.df.SNP.values):
+		"""
+		a=annot.df.SNP.values
+		b=array_snps.df.SNP.values
+		print len(a), len(b)
+		for i in range(len(a)):
+			if a[i]!=b[i]:
+				print(i,a[i],b[i])
+				break
+		print annot.df.SNP.values[0:10]
+		print array_snps.df.SNP.values[0:10]
+                """
+		if np.any(annot.df.SNP.values != array_snps.df.SNP.values):
                     raise ValueError('The .annot file must contain the same SNPs in the same'+\
                         ' order as the .bim file.')
         except Exception:

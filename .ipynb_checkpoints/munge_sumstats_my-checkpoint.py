@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/home/ch6845/tools/miniconda3/envs/py2/bin/python
 from __future__ import division
 import pandas as pd
 import numpy as np
@@ -298,6 +298,7 @@ def parse_dat(dat_gen, convert_colname, merge_alleles, log, args):
         dat_list.append(dat[ii].reset_index(drop=True))
 
     sys.stdout.write(' done\n')
+    #print(dat_list)
     dat = pd.concat(dat_list, axis=0).reset_index(drop=True)
     msg = 'Read {N} SNPs from --sumstats file.\n'.format(N=tot_snps)
     if args.merge_alleles:
@@ -715,8 +716,9 @@ def munge_sumstats(args, p=True):
         log.log(
             msg.format(M=len(dat), F=out_fname + '.gz', N=dat.N.notnull().sum()))
         if p:
-            dat.to_csv(out_fname + '.gz', sep="\t", index=False,
-                       columns=print_colnames, float_format='%.3f', compression = 'gzip')
+            dat.to_csv(out_fname, sep="\t", index=False,
+                       columns=print_colnames, float_format='%.3f')
+            os.system('gzip -f {F}'.format(F=out_fname))
 
         log.log('\nMetadata:')
         CHISQ = (dat.Z ** 2)
